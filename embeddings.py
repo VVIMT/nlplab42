@@ -17,6 +17,26 @@ class EmbeddingsDictionary:
                  word_whitelist=None):
         self.load_embeddings(max_words, path, normalize, word_whitelist)
 
+    def neighborhood(word):
+        emb = EmbeddingsDictionary(100000)
+        neighbors = emb.emb2neighbors(emb.embed(word))
+        for i in neighbors[1]:
+              print(emb.words[i])
+
+    def analogy(self, word1, word2, word3):
+        '''
+        Retrieve words closest to word1 + word2 - word3
+        '''
+
+        ind1 = self.dictionary[word1]
+        ind2 = self.dictionary[word2]
+        ind3 = self.dictionary[word3]
+
+        target_embedding = self.emb[ind1] + self.emb[ind2] - self.emb[ind3]
+        _scores, closest_word_index = self.emb2neighbors(target_embedding, top_k=20)
+        for ind in closest_word_index:
+            print(self.words[ind])
+
     def load_embeddings(self, max_words, path, normalize, word_whitelist):
         '''
         Load the embeddings contained in path.
@@ -59,7 +79,7 @@ class EmbeddingsDictionary:
     def embed(self, token):
         return self.emb[self.dictionary[token]]
 
-    def emb2neighbors(self, query_embedding, top_k=20):
+    def emb2neighbors(self, query_embedding, top_k=10):
         '''
         Retreive the index i of the nearest-neighbors to query_embedding.
         Input: query_embedding must be a tensor of shape [dim]
